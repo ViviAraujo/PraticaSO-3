@@ -9,7 +9,7 @@ public class Diretorio {
 	private String nome;
 	private Arquivo primeiroArq;
 	private Arquivo ultimoArq;
-	private static int CapacidadeTotal = 20;
+	private static int CapacidadeTotal = 15;
 	private int CapacidadeAtual;
 
 	public Diretorio() {
@@ -188,20 +188,20 @@ public class Diretorio {
 	}
 
 	// Visão alto Nivel
-	public void ImprimirArquivosEmUmDiretorio(Diretorio dirt) {
-		int i = 0;
-		Diretorio aux = null;
-		aux = dirt;
-		System.out.println(" " + i + " - " + aux.getNome());
-		Arquivo aux2 = aux.primeiroArq;
-		i++;
-		while (aux2 != null) {
-			System.out.println(" " + i + " - " + aux2.getNome());
-			i++;
-			aux2 = aux2.getProximo();
-		}
-
-	}
+//	public void ImprimirArquivosEmUmDiretorio(Diretorio dirt) {
+//		int i = 0;
+//		Diretorio aux = null;
+//		aux = dirt;
+//		System.out.println(" " + i + " - " + aux.getNome());
+//		Arquivo aux2 = aux.primeiroArq;
+//		i++;
+//		while (aux2 != null) {
+//			System.out.println(" " + i + " - " + aux2.getNome());
+//			i++;
+//			aux2 = aux2.getProximo();
+//		}
+//
+//	}
 
 	public void RemoverArquivo(Diretorio list, String nomeArquivo, String nomeDiretorio) {
 		Diretorio aux = SearchFolder(list, nomeDiretorio);
@@ -233,6 +233,8 @@ public class Diretorio {
 			int vazios = QuantidadeVazios(aux1);
 			if (vazios >= tamanho) {
 				SubstituirVazios(aux1, arquivoName, tamanho);
+			}else {
+				System.out.println("Sem espaço");
 			}
 		}
 	}
@@ -274,7 +276,7 @@ public class Diretorio {
 		return totalArquivos;
 	}
 
-	// Lista todos os arquivos de um Determinado Diretório
+	// Lista todos os arquivos de um Determinado Diretório - alto nivel
 	public void ListarArquivosEmDiretorios(Diretorio list, String nomeDiretorio) {
 		Diretorio aux = SearchFolder(list, nomeDiretorio);
 		String nomeAnterior;
@@ -338,6 +340,8 @@ public class Diretorio {
 //		System.out.println("*******************************");
 //		lista.AdicionarBlocos(lista, "dirt2", 2, "arq3");
 //		lista.ListarArquivosEmDiretorios(lista, "dirt2");
+		
+	
 
 		@SuppressWarnings("resource")
 		Scanner ler = new Scanner(System.in);
@@ -383,7 +387,8 @@ public class Diretorio {
 					System.out.println("Não existe");
 				} else {
 					while (true) {
-						lista.ImprimirArquivosEmUmDiretorio(lista.SearchFolder(lista, nomeDir));
+//						lista.ImprimirArquivosEmUmDiretorio(lista.SearchFolder(lista, nomeDir));
+						lista.ListarArquivosEmDiretorios(lista, nomeDir);
 						path = "cd dir_" + nomeDir;
 						System.out.println("User/raiz/" + path);
 						cmd = ler.nextLine();
