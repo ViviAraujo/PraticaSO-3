@@ -92,7 +92,7 @@ public class Diretorio {
 				ListaDiretorios.ultimo = novoDir;
 				CapacidadeAtual--;
 			} else {
-				ListaDiretorios.ultimo.proximo = novoDir;
+				ListaDiretorios.ultimo.proximo=novoDir;
 				ListaDiretorios.ultimo = novoDir;
 				CapacidadeAtual--;
 			}
@@ -133,10 +133,18 @@ public class Diretorio {
 			if (aux.getNome().equals(novoDir.getNome())) {
 				if (anterior == null) {
 					ListaDiretorios.primeiro = aux.getProximo();
-				} else {
-					anterior.setProximo(aux.getProximo());
+					aux.setProximo(null);
+				} 
+				else if(aux.getNome().equals(ListaDiretorios.ultimo.getNome())) {
+					anterior.setProximo(null);
+					aux.setProximo(null);
+					ListaDiretorios.ultimo=anterior;
 				}
-				aux = null;
+				else {
+					anterior.setProximo(aux.getProximo());
+					aux.setProximo(null);
+				}
+				aux=null;
 			} else {
 				anterior = aux;
 				aux = aux.getProximo();
@@ -146,6 +154,32 @@ public class Diretorio {
 		}
 		ListaDiretorios.setCapacidadeAtual(ListaDiretorios.getCapacidadeAtual() + quantidadeRemovidaArquivos);
 	}
+	
+	public void RemoverArquivoVazios(Diretorio list, int tamanho) {
+		Diretorio aux = list.primeiro;
+		Arquivo aux2= aux.primeiroArq;
+		Arquivo anterior= null;
+		while(aux!=null) {
+			for( int i=0;i<tamanho;i++) {
+				while( aux2!= null) {
+					if(aux2.getNome().equals("vazio")){
+						anterior.setProximo(aux2.getProximo());
+						aux2= null;
+					}else { 
+						anterior=aux2;
+						aux2= aux2.getProximo();
+						
+					}
+					
+				}
+				aux2=aux.primeiroArq;
+			}
+			aux= aux.getProximo();
+		}
+		
+		list.setCapacidadeAtual(list.getCapacidadeAtual() + tamanho);
+	}
+	
 
 	public void ImprimirList(Diretorio list) {
 		Diretorio aux = null;
@@ -186,22 +220,29 @@ public class Diretorio {
 			aux = aux.getProximo();
 		}
 	}
+	
+	public int  QuantidadeVazioGeral(Diretorio list) {
+		Diretorio aux = null;
+		int totalVazio =0;
+		aux = list.primeiro;
+		while (aux != null) {
+			if (aux.getNome().equals("vazio")) {
+				totalVazio++;
+			}
+			Arquivo aux2 = aux.primeiroArq;
+		
+			while (aux2 != null) {
+				if (aux2.getNome().equals("vazio")) {
+					totalVazio++;
+				}
+				aux2 = aux2.getProximo();
+			}
+			aux = aux.getProximo();
+		}
+		return totalVazio;
+	}
 
-	// Visão alto Nivel
-//	public void ImprimirArquivosEmUmDiretorio(Diretorio dirt) {
-//		int i = 0;
-//		Diretorio aux = null;
-//		aux = dirt;
-//		System.out.println(" " + i + " - " + aux.getNome());
-//		Arquivo aux2 = aux.primeiroArq;
-//		i++;
-//		while (aux2 != null) {
-//			System.out.println(" " + i + " - " + aux2.getNome());
-//			i++;
-//			aux2 = aux2.getProximo();
-//		}
-//
-//	}
+	
 
 	public void RemoverArquivo(Diretorio list, String nomeArquivo, String nomeDiretorio) {
 		Diretorio aux = SearchFolder(list, nomeDiretorio);
@@ -219,25 +260,28 @@ public class Diretorio {
 		}
 	}
 
-	public void AdicionarBlocos(Diretorio list, String nomeDiretorio, int tamanho, String arquivoName) {
-		Diretorio aux1 = list.SearchFolder(list, nomeDiretorio);
-
-		if (list.getCapacidadeAtual() >= tamanho) {
-			for (int i = 0; i < tamanho; i++) {
+	public void AdicionarBlocos(Diretorio list,String nomeDiretorio, int tamanho, String arquivoName) {
+		Diretorio aux1= list.SearchFolder(list, nomeDiretorio);
+		
+		if (list.getCapacidadeAtual()>= tamanho) {
+			for( int i=0;i<tamanho;i++) {
 				Arquivo aux = new Arquivo(arquivoName, nomeDiretorio);
 				list.AdicionarArchive(list, aux.getDiretorioName(), aux);
 			}
-			list.setCapacidadeAtual(list.getCapacidadeAtual() - tamanho);
-		} else {
+			list.setCapacidadeAtual(list.getCapacidadeAtual()- tamanho);
+		}else {
 //			System.out.println("Não há espaço");
 			int vazios = QuantidadeVazios(aux1);
-			if (vazios >= tamanho) {
-				SubstituirVazios(aux1, arquivoName, tamanho);
-			}else {
-				System.out.println("Sem espaço");
+			int VazioTotal = QuantidadeVazioGeral(list); 
+			if(vazios >=tamanho) {
+				SubstituirVazios(aux1,arquivoName, tamanho);
+			}else if(VazioTotal >= tamanho) {
+				RemoverArquivoVazios(list, VazioTotal);
+				AdicionarBlocos(list, nomeDiretorio, tamanho, arquivoName);
 			}
 		}
 	}
+	
 
 	public void SubstituirVazios(Diretorio dirt, String nomeArquivo, int tamanho) {
 		Arquivo aux = dirt.primeiroArq;
@@ -254,6 +298,7 @@ public class Diretorio {
 		}
 	}
 
+
 	public int QuantidadeVazios(Diretorio dirt) {
 		Arquivo aux = dirt.primeiroArq;
 		int totalVazio = 0;
@@ -265,6 +310,8 @@ public class Diretorio {
 		}
 		return totalVazio;
 	}
+	
+
 
 	public int QuantidadeArquivosNoDiretorio(Diretorio dirt) {
 		Arquivo aux = dirt.primeiroArq;
@@ -307,39 +354,34 @@ public class Diretorio {
 		Diretorio dirt2 = new Diretorio("dirt2");
 		Diretorio dirt3 = new Diretorio("dirt3");
 		Diretorio dirt = new Diretorio();
-
+		Diretorio dirt4 = new Diretorio("dirt4");
+//		Diretorio dirt5 = new Diretorio("dirt5");
+		
 		lista.CreateFolder(lista, dirt1);
 		lista.CreateFolder(lista, dirt2);
 		lista.CreateFolder(lista, dirt3);
-
+//		lista.CreateFolder(lista, dirt4);
+//		lista.CreateFolder(lista, dirt5);
+//		
+//        lista.DeleteFolder(lista, dirt4);
+////		
+//		lista.CreateFolder(lista, dirt4);
+//		
 //		lista.ImprimirList(lista);
-
-//		lista.DeleteFolder(lista, dirt1);
-//		System.out.println("**************");	
-//		lista.ImprimirList(lista);
-
-//		Arquivo arq1 = new Arquivo("arq1", "dirt1");
-//		Arquivo arq2 = new Arquivo("arq2", "dirt1");
-
+		
 		lista.AdicionarBlocos(lista, "dirt1", 2, "arq1");
 		lista.AdicionarBlocos(lista, "dirt1", 3, "arq2");
 		lista.AdicionarBlocos(lista, "dirt1", 4, "arq3");
+		lista.AdicionarBlocos(lista, "dirt1", 2, "arq4");
+		
+//---		lista.RemoverArquivo(lista, "arq2", "dirt1");
+//		int vaz= lista.QuantidadeVazioGeral(lista);
+//		System.out.println("vazT"+vaz);
+//		lista.RemoverArquivoVazios(lista, "dirt1",vaz);
+//	---	lista.AdicionarBlocos(lista, "dirt2", 2, "arq5");
 
-//	lista.RemoverArquivo(lista, "arq2", "dirt1");
-//	lista.AdicionarBlocos(lista, "dirt1", 2, "arq4");
 
-//		lista.ImprimirArquivosEmDiretorios(lista);
-
-//		lista.DeleteFolder(lista, dirt1);
-
-//		lista.ImprimirArquivosEmDiretorios(lista);
-//		lista.ImprimirArquivosEmUmDiretorio(dirt1);
-
-//		System.out.println("*******************************");
-//		lista.ListarArquivosEmDiretorios(lista, "dirt1");
-//		System.out.println("*******************************");
-//		lista.AdicionarBlocos(lista, "dirt2", 2, "arq3");
-//		lista.ListarArquivosEmDiretorios(lista, "dirt2");
+		
 		
 	
 
